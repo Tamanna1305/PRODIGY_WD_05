@@ -147,3 +147,12 @@ window.onload = () => {
     getWeather();
   }
 };
+
+function updateTime() {
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  document.getElementById("time").textContent = timeStr;
+}
+
+setInterval(updateTime, 1000);
+updateTime(); // call once on load
