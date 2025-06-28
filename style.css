@@ -7,7 +7,7 @@
 }
 
 body {
-  background: linear-gradient(135deg, #b66ec5, #b265bc);
+  background: none;
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -27,6 +27,15 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 1;
+}
+
+body.night .home-container,
+body.rain .home-container,
+body.clear .home-container,
+body.snow .home-container,
+body.fog .home-container {
+  background: transparent;
 }
 
 .home-card {
@@ -36,7 +45,6 @@ body {
   text-align: center;
   backdrop-filter: blur(10px);
   box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-  color: #fff;
 }
 
 .home-icon {
@@ -135,12 +143,6 @@ body {
   opacity: 0.8;
 }
 
-#time {
-  font-size: 14px;
-  opacity: 0.8;
-  margin-top: 4px;
-}
-
 /* === TEMPERATURE & ICON === */
 .temp-icon {
   display: flex;
@@ -219,9 +221,9 @@ body {
   margin: 4px 0;
 }
 
-/* === WEATHER ANIMATIONS === */
+/* === ANIMATED BACKGROUNDS === */
 
-/* === NIGHT === */
+/* NIGHT */
 body.night {
   background: radial-gradient(circle at top, #1e1e2f, #020314);
 }
@@ -238,7 +240,7 @@ body.night {
   50% { opacity: 1; }
 }
 
-/* === RAIN === */
+/* RAIN */
 body.rain {
   background: linear-gradient(to bottom, #1e1e2f, #121218);
 }
@@ -254,7 +256,7 @@ body.rain {
   100% { top: 100vh; opacity: 0; }
 }
 
-/* === SNOW === */
+/* SNOW */
 body.snow {
   background: linear-gradient(to bottom, #a0c4ff, #ffffff);
 }
@@ -272,7 +274,7 @@ body.snow {
   100% { transform: translateY(100vh); }
 }
 
-/* === FOG === */
+/* FOG */
 body.fog {
   background: linear-gradient(to bottom, #cccccc, #888888);
 }
@@ -289,7 +291,7 @@ body.fog {
   100% { transform: translateX(0%); }
 }
 
-/* === CLEAR / SUNNY === */
+/* CLEAR / SUNNY */
 body.clear {
   background: linear-gradient(to top right, #fceabb, #f8b500);
 }
@@ -305,44 +307,4 @@ body.clear {
 @keyframes floatSun {
   0% { transform: translateY(0) scale(1); }
   100% { transform: translateY(-20px) scale(1.2); }
-}
-
-/* === CLOUDY === */
-body.cloudy {
-  background: linear-gradient(to bottom, #d7d2cc, #304352);
-}
-
-.cloud {
-  position: absolute;
-  background: #ffffff55;
-  border-radius: 50%;
-  filter: blur(10px);
-  animation: floatClouds 60s linear infinite;
-}
-
-.cloud::after,
-.cloud::before {
-  content: '';
-  position: absolute;
-  background: inherit;
-  border-radius: 50%;
-}
-
-.cloud::after {
-  width: 80%;
-  height: 80%;
-  top: -20%;
-  left: 10%;
-}
-
-.cloud::before {
-  width: 60%;
-  height: 60%;
-  top: 10%;
-  left: -10%;
-}
-
-@keyframes floatClouds {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100vw); }
 }
