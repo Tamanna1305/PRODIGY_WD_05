@@ -1,4 +1,6 @@
 const apiKey = "ae4631450b56d01af4bb252822e0ed02";
+let currentTimezoneOffset = 0;
+let timerInterval;
 
 function startApp() {
   window.location.href = "dashboard.html";
@@ -10,12 +12,59 @@ function getWeather() {
   fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`)
     .then(res => res.json())
     .then(data => {
-      displayWeather(data);
-      updateBackground(data.weather[0].icon, data.weather[0].main.toLowerCase());
+      document.getElementById("location").textContent = data.name;
+      document.getElementById("temperature").textContent = `${Math.round(data.main.temp)}°`;
+      document.getElementById("condition").textContent = data.weather[0].main;
+      document.getElementById("humidity").textContent = `${data.main.humidity}%`;
+      document.getElementById("wind").textContent = `${data.wind.speed} km/h`;
+      document.getElementById("precip").textContent = `${data.clouds.all}%`;
+
+      const iconCode = data.weather[0].icon;
+      document.getElementById("weatherIcon").src = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+
+      // Update timezone offset and start clock
+      currentTimezoneOffset = data.timezone;
+      startLocalClock(data.dt);
+
+      updateBackground(iconCode, data.weather[0].main.toLowerCase());
+
       getForecast(city);
     })
     .catch(() => alert("City not found!"));
 }
+
+function startLocalClock(utcTimestamp) {
+  if (timerInterval) clearInterval(timerInterval);
+
+  let baseUtc = utcTimestamp * 1000; // Convert to milliseconds
+
+  function updateClock() {
+    const now = new Date(); // Current local time
+    const nowUtc = now.getTime() + now.getTimezoneOffset() * 60000; // Convert to UTC
+
+    const localTime = new Date(nowUtc + currentTimezoneOffset * 1000); // Apply city timezone offset
+
+    const dayStr = localTime.toLocaleDateString("en-US", {
+      weekday: "long",
+      month: "short",
+      day: "numeric",
+      year: "numeric"
+    });
+
+    const timeStr = localTime.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true
+    });
+
+    document.getElementById("date").textContent = `${dayStr}, ${timeStr}`;
+  }
+
+  updateClock();
+  timerInterval = setInterval(updateClock, 1000);
+}
+
 
 function getForecast(city) {
   fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`)
@@ -27,7 +76,9 @@ function getForecast(city) {
       const daily = {};
       data.list.forEach(item => {
         const date = item.dt_txt.split(" ")[0];
-        if (!daily[date]) daily[date] = item;
+        if (!daily[date]) {
+          daily[date] = item;
+        }
       });
 
       let count = 0;
@@ -46,37 +97,15 @@ function getForecast(city) {
     });
 }
 
-function displayWeather(data) {
-  document.getElementById("location").textContent = data.name;
-  document.getElementById("temperature").textContent = `${Math.round(data.main.temp)}°`;
-  document.getElementById("condition").textContent = data.weather[0].main;
-  document.getElementById("humidity").textContent = `${data.main.humidity}%`;
-  document.getElementById("wind").textContent = `${data.wind.speed} km/h`;
-  document.getElementById("precip").textContent = `${data.clouds.all}%`;
-  document.getElementById("weatherIcon").src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
-  document.getElementById("date").textContent = new Date().toDateString();
-}
-
-function getWeatherByCoords(lat, lon) {
-  fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`)
-    .then(res => res.json())
-    .then(data => {
-      displayWeather(data);
-      updateBackground(data.weather[0].icon, data.weather[0].main.toLowerCase());
-      getForecast(data.name);
-    })
-    .catch(() => alert("Unable to fetch weather for your location."));
-}
-
 function updateBackground(iconCode, condition) {
   document.body.className = "";
-  document.querySelectorAll(".raindrop, .snowflake, .fog-layer, .star, .sunshine, .cloud").forEach(e => e.remove());
+  document.querySelectorAll(".raindrop, .snowflake, .fog-layer, .star, .sunshine").forEach(e => e.remove());
 
   const isNight = iconCode.endsWith("n");
 
   if (isNight) {
     document.body.classList.add("night");
-    for (let i = 0; i < 80; i++) {
+    for (let i = 0; i < 100; i++) {
       const star = document.createElement("div");
       star.className = "star";
       star.style.left = Math.random() * 100 + "vw";
@@ -94,7 +123,7 @@ function updateBackground(iconCode, condition) {
     }
   } else if (condition.includes("snow")) {
     document.body.classList.add("snow");
-    for (let i = 0; i < 60; i++) {
+    for (let i = 0; i < 80; i++) {
       const flake = document.createElement("div");
       flake.className = "snowflake";
       flake.style.left = Math.random() * 100 + "vw";
@@ -119,40 +148,7 @@ function updateBackground(iconCode, condition) {
       sunDot.style.animationDelay = Math.random() * 5 + "s";
       document.body.appendChild(sunDot);
     }
-  } else if (condition.includes("cloud")) {
-    document.body.classList.add("cloudy");
-    for (let i = 0; i < 6; i++) {
-      const cloud = document.createElement("div");
-      cloud.className = "cloud";
-      cloud.style.left = Math.random() * 100 + "vw";
-      cloud.style.top = `${Math.random() * 40 + 10}px`;
-      cloud.style.animationDelay = Math.random() * 10 + "s";
-      document.body.appendChild(cloud);
-    }
   }
 }
 
-window.onload = () => {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        getWeatherByCoords(pos.coords.latitude, pos.coords.longitude);
-      },
-      (err) => {
-        console.warn("Location access denied. Using default.");
-        getWeather();
-      }
-    );
-  } else {
-    getWeather();
-  }
-};
-
-function updateTime() {
-  const now = new Date();
-  const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  document.getElementById("time").textContent = timeStr;
-}
-
-setInterval(updateTime, 1000);
-updateTime(); // call once on load
+window.onload = getWeather;
