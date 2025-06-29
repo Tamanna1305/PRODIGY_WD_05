@@ -1,4 +1,4 @@
-/* === RESET AND BASE === */
+/* === BASIC RESET === */
 * {
   margin: 0;
   padding: 0;
@@ -7,7 +7,6 @@
 }
 
 body {
-  background: none;
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -15,71 +14,49 @@ body {
   padding: 20px;
   position: relative;
   overflow: hidden;
-  transition: background 0.5s ease;
   color: #fff;
+  transition: background 0.6s ease;
 }
 
-/* === HOME PAGE === */
-.home-container {
+/* === BACKGROUND VIDEO === */
+#bgVideo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
   height: 100vh;
-  width: 100%;
-  background: linear-gradient(135deg, #b66ec5, #b265bc);
+  object-fit: cover;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* === LOADER === */
+.loader-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+  display: none;
 }
 
-body.night .home-container,
-body.rain .home-container,
-body.clear .home-container,
-body.snow .home-container,
-body.fog .home-container {
-  background: transparent;
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #fff;
+  border-top: 5px solid #942ba6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 
-.home-card {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 40px 30px;
-  border-radius: 25px;
-  text-align: center;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-}
-
-.home-icon {
-  width: 100px;
-  margin-bottom: 20px;
-}
-
-.home-card h1 {
-  font-size: 28px;
-  margin-bottom: 20px;
-}
-
-.home-card h1 span {
-  font-weight: 300;
-}
-
-.home-card button {
-  padding: 10px 25px;
-  font-size: 16px;
-  background: linear-gradient(to right, #641378, #9a6fff);
-  color: #fff;
-  border: none;
-  border-radius: 20px;
-  cursor: pointer;
-  margin-bottom: 10px;
-  transition: 0.3s;
-}
-
-.home-card button:hover {
-  transform: scale(1.05);
-}
-
-.home-card p {
-  font-size: 13px;
-  opacity: 0.7;
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 /* === DASHBOARD CONTAINER === */
@@ -92,6 +69,8 @@ body.fog .home-container {
   backdrop-filter: blur(15px);
   box-shadow: 0 0 25px rgba(0, 0, 0, 0.1);
   color: #fff;
+  z-index: 10;
+  position: relative;
 }
 
 /* === TOP BAR === */
@@ -99,16 +78,16 @@ body.fog .home-container {
   display: flex;
   justify-content: space-between;
   margin-bottom: 20px;
+  gap: 10px;
 }
 
 .top-bar input {
-  flex: 1;
+  width: 100%;
   padding: 10px;
   border-radius: 12px;
   border: none;
   outline: none;
   font-size: 14px;
-  margin-right: 10px;
   background: rgba(255, 255, 255, 0.2);
   color: #fff;
 }
@@ -127,6 +106,36 @@ body.fog .home-container {
   background: #942ba6;
 }
 
+/* === SUGGESTIONS === */
+.suggestion-list {
+  list-style: none;
+  background: rgba(255,255,255,0.15);
+  margin-top: 4px;
+  border-radius: 12px;
+  padding: 5px 0;
+  max-height: 150px;
+  overflow-y: auto;
+  position: absolute;
+  width: 100%;
+  z-index: 99;
+}
+
+.suggestion-list li {
+  padding: 8px 12px;
+  cursor: pointer;
+  color: #fff;
+}
+
+.suggestion-list li:hover {
+  background-color: rgba(255,255,255,0.2);
+}
+
+/* Hide the suggestion list when it's empty */
+.suggestion-list:empty {
+  display: none;
+}
+
+
 /* === LOCATION + DATE === */
 .location-date {
   text-align: center;
@@ -138,7 +147,7 @@ body.fog .home-container {
   font-weight: 600;
 }
 
-#date {
+#date, #time {
   font-size: 13px;
   opacity: 0.8;
 }
@@ -154,7 +163,6 @@ body.fog .home-container {
 #temperature {
   font-size: 64px;
   font-weight: bold;
-  color: #fff;
 }
 
 #weatherIcon {
@@ -219,92 +227,4 @@ body.fog .home-container {
 .day-card p {
   font-size: 14px;
   margin: 4px 0;
-}
-
-/* === ANIMATED BACKGROUNDS === */
-
-/* NIGHT */
-body.night {
-  background: radial-gradient(circle at top, #1e1e2f, #020314);
-}
-.star {
-  position: absolute;
-  width: 2px;
-  height: 2px;
-  background: white;
-  border-radius: 50%;
-  animation: twinkle 4s ease-in-out infinite;
-}
-@keyframes twinkle {
-  0%, 100% { opacity: 0.2; }
-  50% { opacity: 1; }
-}
-
-/* RAIN */
-body.rain {
-  background: linear-gradient(to bottom, #1e1e2f, #121218);
-}
-.raindrop {
-  position: absolute;
-  width: 2px;
-  height: 20px;
-  background: rgba(255, 255, 255, 0.2);
-  animation: rainFall 0.6s linear infinite;
-}
-@keyframes rainFall {
-  0% { top: -20px; opacity: 0.5; }
-  100% { top: 100vh; opacity: 0; }
-}
-
-/* SNOW */
-body.snow {
-  background: linear-gradient(to bottom, #a0c4ff, #ffffff);
-}
-.snowflake {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  background: white;
-  border-radius: 50%;
-  opacity: 0.8;
-  animation: snowFall 6s linear infinite;
-}
-@keyframes snowFall {
-  0% { transform: translateY(-10px); }
-  100% { transform: translateY(100vh); }
-}
-
-/* FOG */
-body.fog {
-  background: linear-gradient(to bottom, #cccccc, #888888);
-}
-.fog-layer {
-  position: absolute;
-  width: 200%;
-  height: 100px;
-  background: rgba(255,255,255,0.2);
-  filter: blur(20px);
-  animation: fogMove 30s linear infinite;
-}
-@keyframes fogMove {
-  0% { transform: translateX(-50%); }
-  100% { transform: translateX(0%); }
-}
-
-/* CLEAR / SUNNY */
-body.clear {
-  background: linear-gradient(to top right, #fceabb, #f8b500);
-}
-.sunshine {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  background: rgba(255, 204, 0, 0.6);
-  border-radius: 50%;
-  box-shadow: 0 0 20px 5px rgba(255, 204, 0, 0.4);
-  animation: floatSun 4s ease-in-out infinite alternate;
-}
-@keyframes floatSun {
-  0% { transform: translateY(0) scale(1); }
-  100% { transform: translateY(-20px) scale(1.2); }
 }
